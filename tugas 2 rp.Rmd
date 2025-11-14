@@ -1,0 +1,89 @@
+---
+title: "Canonical Corelation"
+output: html_document
+date: "2025-11-09"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+Canonical Corelation (cca) merupakan metode korelasi untuk dua dataset 
+
+```{r}
+library(CCA)
+library(CCP)
+library(readr)
+library(readxl)
+```
+
+data yang digunkan merupakan data pdrb, pad, dau,jumlah penduduk, biaya rutin dan biaya modal provinsi indonesia \n
+data diambil dari:
+
+https://sulut.bps.go.id/id/statistics-table/2/OTU4IzI=/jumlah-penduduk-menurut-provinsi-di-indonesia.html
+https://djpk.kemenkeu.go.id/portal/data/apbd?periode=12&tahun=2024&provinsi=32&pemda=00
+https://djpk.kemenkeu.go.id/wp-content/uploads/2023/09/Rincian-Alokasi-DAU-DBH-TA-2024.pdf
+
+```{r}
+dat=read_excel("kmsv2.xlsx")
+```
+
+data dibagi menjadi variabel pemasukan (pdrb, pad, dau) dan variabel pengeluaran (jumlah peduduk, biaya rutin, biaya modal)
+
+```{r}
+tunel=dat[c("pdrb","pad","DAU")]
+```
+
+```{r}
+chungus=dat[c("penduduk","boperasi","belanjamodal")]
+```
+
+# hasil cca
+
+```{r}
+chese <- cc(tunel, chungus)
+```
+
+```{r}
+chese$cor
+```
+
+```{r}
+chese[3:4]
+```
+
+
+## visualisasi cca
+```{r}
+gage <- as.data.frame(chese$scores$xscores)
+mbt <- as.data.frame(chese$scores$yscores)
+```
+
+
+
+
+```{r}
+n <- nrow(tunel)
+p <- ncol(tunel)
+q <- ncol(chungus)
+```
+
+
+```{r}
+pea <- p.asym(chese$cor, n, p, q, tstat = "Wilks")
+```
+
+
+
+```{r}
+loadings_health <- cor(tunel, gage)
+loadings_mental <- cor(chungus, mbt)
+```
+
+```{r}
+plot(gage[,1], mbt[,1],
+     xlab = "pemasukan Canonical Variate 1",
+     ylab = "pengeluaran Canonical Variate 1",
+     main = "Canonical Correlation between pemasukan and pengeluaran")
+```
